@@ -11,14 +11,15 @@ const isMobileMenuOpen = ref(false)
       <div class="flex items-center justify-between h-16">
         
         <!-- Logo -->
-        <RouterLink to="/" class="flex items-center gap-2 font-bold text-xl text-white">
-          <div class="bg-amber-400 text-[#0b2545] p-1.5 rounded-lg flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-            </svg>
-          </div>
-          <span>KörkortKlar</span>
-        </RouterLink>
+       <!-- Logo -->
+<RouterLink to="/" class="flex items-center gap-2.5 font-extrabold text-xl tracking-tight text-white">
+  <img 
+    src="/logo.png" 
+    alt="KörkortKlar Logo" 
+    class="w-9 h-9 object-contain rounded-lg"
+  />
+  <span>KörkortKlar</span>
+</RouterLink>
 
         <!-- Desktop Navigation Links -->
         <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
