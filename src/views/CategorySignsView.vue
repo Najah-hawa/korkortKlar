@@ -30,6 +30,32 @@ const openModal = (sign: RoadSign) => {
 const closeModal = () => {
   selectedSign.value = null
 }
+
+// Hitta index för det aktiva vägmärket i listan
+const currentIndex = computed(() => {
+  if (!selectedSign.value) return -1
+  return categorySigns.value.findIndex(s => s.id === selectedSign.value?.id)
+})
+
+// Gå till föregående vägmärke
+const prevSign = () => {
+  if (currentIndex.value > 0) {
+    selectedSign.value = categorySigns.value[currentIndex.value - 1] ?? null
+  } else {
+    // Loopa till sista om man är på första
+    selectedSign.value = categorySigns.value[categorySigns.value.length - 1] ?? null
+  }
+}
+
+// Gå till nästa vägmärke
+const nextSign = () => {
+  if (currentIndex.value < categorySigns.value.length - 1) {
+    selectedSign.value = categorySigns.value[currentIndex.value + 1] ?? null
+  } else {
+    // Loopa till första om man är på sista
+    selectedSign.value = categorySigns.value[0] ?? null
+  }
+}
 </script>
 
 <template>
@@ -49,6 +75,9 @@ const closeModal = () => {
         </h1>
         <p class="text-slate-600 text-base">
           Här visas alla vägmärken som ingår i denna kategori. Klicka på ett märke för att se detaljer.
+        </p>
+        <p class="text-slate-600 text-base">
+          Varningsmärken kännetecknas av sin triangulära form med röd rand och vit (eller gul/oransje i vissa tillfälliga fall) botten, och deras syfte är att uppmärksamma trafikanter på farliga situationer eller hinder längre fram på vägen så att de kan anpassa sin körning i god tid.
         </p>
       </div>
 
@@ -90,13 +119,14 @@ const closeModal = () => {
 
     </div>
 
-    <!-- DETAIL MODAL -->
+    <!-- DETAIL MODAL MED NAVIGERING (FÖREGÅENDE / NÄSTA) -->
     <div v-if="selectedSign" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
       <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative space-y-6 border border-slate-100">
         
+        <!-- Stäng-knapp -->
         <button 
           @click="closeModal" 
-          class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold transition-colors"
+          class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold transition-colors z-10"
         >
           ✕
         </button>
@@ -106,12 +136,34 @@ const closeModal = () => {
             {{ selectedSign.code }}
           </span>
           <span class="text-xs uppercase tracking-wider font-semibold text-slate-400">
-            {{ selectedSign.categoryCode }}
+            {{ selectedSign.categoryCode }} ({{ currentIndex + 1 }} / {{ categorySigns.length }})
           </span>
         </div>
 
-        <div class="w-44 h-44 mx-auto flex items-center justify-center bg-slate-50 rounded-2xl p-4 border border-slate-100">
-          <img :src="selectedSign.image" :alt="selectedSign.title" class="max-h-full max-w-full object-contain drop-shadow-lg" />
+        <!-- Bild och Navigeringspilar på sidorna -->
+        <div class="relative flex items-center justify-center">
+          <!-- Föregående knapp -->
+          <button 
+            @click="prevSign"
+            class="absolute left-0 -ml-2 z-10 w-9 h-9 rounded-full bg-slate-100 hover:bg-[#0b2545] hover:text-white text-slate-700 flex items-center justify-center shadow-md transition-all font-bold"
+            title="Föregående vägmärke"
+          >
+            ‹
+          </button>
+
+          <!-- Bildbox -->
+          <div class="w-44 h-44 mx-auto flex items-center justify-center bg-slate-50 rounded-2xl p-4 border border-slate-100">
+            <img :src="selectedSign.image" :alt="selectedSign.title" class="max-h-full max-w-full object-contain drop-shadow-lg" />
+          </div>
+
+          <!-- Nästa knapp -->
+          <button 
+            @click="nextSign"
+            class="absolute right-0 -mr-2 z-10 w-9 h-9 rounded-full bg-slate-100 hover:bg-[#0b2545] hover:text-white text-slate-700 flex items-center justify-center shadow-md transition-all font-bold"
+            title="Nästa vägmärke"
+          >
+            ›
+          </button>
         </div>
 
         <div class="space-y-3 text-left">
@@ -138,4 +190,4 @@ const closeModal = () => {
     </div>
 
   </div>
-</template>
+</template> 
