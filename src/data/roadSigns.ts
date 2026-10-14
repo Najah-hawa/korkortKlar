@@ -12,14 +12,23 @@ export interface RoadSign {
 export const roadSignsData: RoadSign[] = [
   // A. Varningsmärken
   {
-    id: 'a20',
-    title: 'Varning för korsande trafik',
+    id: 'a1',
+    title: ' Varning för farlig kurva',
     categoryCode: 'A',
     categoryName: 'A. Varningsmärken',
-    code: 'A20',
+    code: 'A1',
     image: 'https://www.transportstyrelsen.se/globalassets/global/vag/vagmarken2/a.-varningsmarken/a01.-varning-for-farlig-kurva/a1-1.png',
-    description: 'Varnar för en vägkorsning där fordonsförare från anslutande väg har väjningsplikt eller där högerregeln gäller.',
-    ruleTips: 'Var uppmärksam på korsande trafik och anpassa hastigheten.'
+    description: 'Märket anger en farlig kurva samt kurvans riktning.',
+    ruleTips: 'Sänk hastigheten i god tid före kurvan, anpassa placeringen i körfältet och undvik kraftiga inbromsningar eller omkörningar i kurvan.'
+  },{
+    id: 'a2',
+    title: 'Varning för flera farliga kurvor',
+    categoryCode: 'A',
+    categoryName: 'A. Varningsmärken',
+    code: 'A2',
+    image: 'https://www.transportstyrelsen.se/globalassets/global/vag/vagmarken2/a.-varningsmarken/a02.-varning-for-flera-farliga-kurvor/a2-1.png',
+    description: 'Märket anger flera farliga kurvor samt den första farliga kurvans riktning.',
+    ruleTips: 'Symbolen visar riktningen på den första kurvan. Sänk hastigheten i god tid och håll den låg genom hela kurvpartiet. Om sträckan är längre än 1 km kompletteras märket med en tilläggstavla för avstånd.'
   },
 
   // B. Väjningspliktsmärken

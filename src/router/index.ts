@@ -8,11 +8,16 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView
-    }, 
+    },
     {
       path: '/kategorier',
       name: 'categories',
       component: () => import('../views/CategoriesView.vue')
+    },
+    {
+      path: '/vagmarken/kategori/:categoryCode',
+      name: 'category-signs',
+      component: () => import('@/views/CategorySignsView.vue')
     }, 
     {
       path: '/quiz',
