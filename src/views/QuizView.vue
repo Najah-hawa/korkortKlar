@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import emailjs from '@emailjs/browser'
 import type { Question, QuestionOption } from '@/types/question'
-import { 
+import {
+  allQuestions,
   getQuestionsByCategory, 
   generateQuickTest, 
   generateFullTeoriprov 
@@ -15,10 +16,32 @@ const router = useRouter()
 // --- STATE ---
 const questions = ref<Question[]>([])
 const currentIndex = ref(0)
+const selectedAnswers = ref<Record<string, QuestionOption['id']>>({})
 const selectedOptionId = ref<'A' | 'B' | 'C' | 'D' | null>(null)
 const isAnswered = ref(false)
 const isSaved = ref(false)
 const isSendingReport = ref(false)
+const isFullTest = ref(false)
+
+// --- TIMER STATE (50 Minuter) ---
+const timeLeft = ref(50 * 60) // 3000 sekunder
+let timerInterval: number | null = null
+// Formatera sekunder till MM:SS
+const formattedTime = computed(() => {
+  const minutes = Math.floor(timeLeft.value / 60)
+  const seconds = timeLeft.value % 60
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+})
+
+const startTimer = () => {
+  timerInterval = window.setInterval(() => {
+    if (timeLeft.value > 0) {
+      timeLeft.value--
+    } else {
+      finishTest() // Tiden är slut - avsluta automatiskt
+    }
+  }, 1000)
+}
 
 // Reaktiv variabel för de blandade alternativen i den aktuella frågan
 const currentShuffledOptions = ref<QuestionOption[]>([])
@@ -40,6 +63,8 @@ const loadQuestionState = () => {
   if (q && q.options) {
     // Vi blandar ordningen på alternativen
     currentShuffledOptions.value = shuffleArray(q.options)
+    const savedQuestionIds = JSON.parse(localStorage.getItem('korkortklar_saved_questions') || '[]') as string[]
+    isSaved.value = savedQuestionIds.includes(q.id)
   } else {
     currentShuffledOptions.value = []
   }
@@ -47,22 +72,76 @@ const loadQuestionState = () => {
 
 // --- INITIALISERING ---
 onMounted(() => {
-  const categoryParam = route.query.category as string
   const typeParam = route.query.type as string
+  const categoryParam = route.query.category as string
 
-  if (typeParam === 'quick') {
-    questions.value = generateQuickTest()
-  } else if (typeParam === 'full') {
+  if (typeParam === 'full') {
+    isFullTest.value = true
     questions.value = generateFullTeoriprov()
+    startTimer()
+  } else if (typeParam === 'wrong') {
+    const wrongQuestionIds = JSON.parse(localStorage.getItem('korkortklar_wrong_questions') || '[]') as string[]
+    questions.value = allQuestions.filter(question => wrongQuestionIds.includes(question.id))
+  } else if (typeParam === 'quick') {
+    questions.value = generateQuickTest()
   } else if (categoryParam) {
     questions.value = getQuestionsByCategory(categoryParam)
   } else {
     questions.value = generateQuickTest()
   }
 
-  // Ladda och blanda alternativen för första frågan
   loadQuestionState()
 })
+
+onUnmounted(() => {
+  if (timerInterval) clearInterval(timerInterval)
+})
+
+// --- AVSLUTA PROV & BERÄKNA RESULTAT ---
+const finishTest = () => {
+  if (timerInterval) clearInterval(timerInterval)
+
+  // Räkna antal rätta svar
+  let correctCount = 0
+  const answers = questions.value.map(question => ({
+    questionId: question.id,
+    selectedAnswerId: selectedAnswers.value[question.id] ?? null,
+    correctAnswerId: question.correctAnswerId
+  }))
+  questions.value.forEach(q => {
+    if (selectedAnswers.value[q.id] === q.correctAnswerId) {
+      correctCount++
+    }
+  })
+
+  localStorage.setItem('korkortklar_last_test_result', JSON.stringify({
+    score: correctCount,
+    total: questions.value.length,
+    passed: correctCount >= 52,
+    answers
+  }))
+
+  const wrongQuestionIds = JSON.parse(localStorage.getItem('korkortklar_wrong_questions') || '[]') as string[]
+  const wrongAnswers = JSON.parse(localStorage.getItem('korkortklar_wrong_answers') || '{}') as Record<string, QuestionOption['id']>
+  answers.forEach(answer => {
+    if (answer.selectedAnswerId && answer.selectedAnswerId !== answer.correctAnswerId) {
+      if (!wrongQuestionIds.includes(answer.questionId)) wrongQuestionIds.push(answer.questionId)
+      wrongAnswers[answer.questionId] = answer.selectedAnswerId
+    }
+  })
+  localStorage.setItem('korkortklar_wrong_questions', JSON.stringify(wrongQuestionIds))
+  localStorage.setItem('korkortklar_wrong_answers', JSON.stringify(wrongAnswers))
+
+  // Navigera till resultatsidan med poäng och totalt antal
+  router.push({
+    path: '/resultat',
+    query: {
+      score: correctCount.toString(),
+      total: questions.value.length.toString(),
+      passed: (correctCount >= 52).toString()
+    }
+  })
+}
 
 // --- COMPUTED PROPERTIES ---
 const currentQuestion = computed(() => questions.value[currentIndex.value] || null)
@@ -83,6 +162,8 @@ const nextQuestion = () => {
     currentIndex.value++
     resetQuestionState()
     loadQuestionState() // Blanda alternativen för nästa fråga!
+  } else if (isFullTest.value) {
+    finishTest()
   } else {
     router.push('/kategorier')
   }
@@ -97,11 +178,28 @@ const resetQuestionState = () => {
 const selectOption = (optionId: QuestionOption['id']) => {
   if (isAnswered.value) return
   selectedOptionId.value = optionId
+  if (currentQuestion.value) {
+    selectedAnswers.value[currentQuestion.value.id] = optionId
+  }
   isAnswered.value = true
 }
 
 const toggleSaveQuestion = () => {
-  isSaved.value = !isSaved.value
+  const question = currentQuestion.value
+  if (!question) return
+
+  const savedQuestionIds = JSON.parse(localStorage.getItem('korkortklar_saved_questions') || '[]') as string[]
+  if (savedQuestionIds.includes(question.id)) {
+    localStorage.setItem(
+      'korkortklar_saved_questions',
+      JSON.stringify(savedQuestionIds.filter(id => id !== question.id))
+    )
+    isSaved.value = false
+  } else {
+    savedQuestionIds.push(question.id)
+    localStorage.setItem('korkortklar_saved_questions', JSON.stringify(savedQuestionIds))
+    isSaved.value = true
+  }
 }
 
 // --- EMAILJS FELRAPPORTERING ---
@@ -136,11 +234,28 @@ const reportError = async () => {
 </script>
 
 <template>
+  <!-- HEADER MED TIMER (Visas bara vid skarpt teoriprov) -->
+<div v-if="isFullTest" class="flex items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-xs mb-6">
+  <div class="flex items-center gap-2 font-bold text-[#0b2545]">
+    <span>⏱️ Återstående tid:</span>
+    <span class="text-xl font-black font-mono text-amber-600 bg-amber-50 px-3 py-1 rounded-lg border border-amber-200">
+      {{ formattedTime }}
+    </span>
+  </div>
+
+  <button 
+    @click="finishTest"
+    class="bg-red-50 hover:bg-red-100 text-red-700 font-extrabold text-xs sm:text-sm px-4 py-2 rounded-xl transition-all border border-red-200 cursor-pointer"
+  >
+    🏁 Avsluta provet
+  </button>
+</div>
   <div class="min-h-screen bg-slate-50/50 py-8 px-4 sm:px-6 lg:px-8">
     <div v-if="currentQuestion" class="max-w-4xl mx-auto space-y-6">
       
       <!-- 1. PROGRESS BAR & STATUS -->
       <div class="flex items-center gap-4">
+        
         <span class="text-sm font-bold text-[#0b2545] whitespace-nowrap">
           Fråga {{ currentIndex + 1 }} av {{ questions.length }}
         </span>

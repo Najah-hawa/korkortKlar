@@ -13,7 +13,7 @@ const toggleFaq = (index: number) => {
 
 const startFullTest = () => {
   // Navigera till quiz-sidan med parametern för fullständigt teoriprov
-  router.push({ path: '/ova', query: { type: 'full' } })
+  router.push({ path: '/quiz', query: { type: 'full' } })
 }
 
 const faqList = [
