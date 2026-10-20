@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref , computed} from 'vue'
 import { RouterLink } from 'vue-router'
+import { allQuestions } from '@/data/questions'
 
+// حساب العدد الإجمالي للأسئلة بشكل ديناميكي
+const totalQuestionsCount = computed(() => allQuestions.length)
 // حالة افتراضية لتقدم المستخدم (يمكن ربطها لاحقاً بـ Pinia)
 const userProgress = ref({
   completedQuestions: 37,
@@ -43,9 +46,14 @@ const userProgress = ref({
       </h1>
 
       <!-- Description -->
-      <p class="text-slate-700 text-base sm:text-lg font-medium leading-relaxed max-w-lg">
-        Öva på hundratals uppdaterade teorifrågor helt gratis och förbered dig inför Trafikverkets prov.
-      </p>
+     <div class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0b2545] leading-[1.15] tracking-tight">
+  <span class="text-4xl sm:text-5xl font-black text-[#0b2545]">
+    {{ totalQuestionsCount }} +
+  </span>
+  <p class="text-slate-600 font-semibold text-sm sm:text-base">
+    Unika teorifrågor och vägmärken baserade på Trafikverket
+  </p>
+</div>
 
       <!-- CTA Button -->
       <div class="pt-2">

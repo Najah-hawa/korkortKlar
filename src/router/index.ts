@@ -29,6 +29,7 @@ const router = createRouter({
       name: 'teoriprov-info',
       component: () => import('../views/TeoriprovInfoView.vue')
     },
+   
     {
       path: '/resultat',
       name: 'results',
