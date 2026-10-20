@@ -1,11 +1,12 @@
 import type { Question } from '@/types/question'
 import { vagmarkenQuestions } from './vagmarken'
+import {parkeringTillstandQuestions} from './trafikregler_parkering'
 // نقوم باستيراد بقية الملفات هنا عند إنشائها (trafikregler, miljo, etc.)
 
 // 1. تجميع بنك الأسئلة الشامل
 export const allQuestions: Question[] = [
-  ...vagmarkenQuestions
-  // ...trafikreglerQuestions,
+  ...vagmarkenQuestions,
+  ...parkeringTillstandQuestions
   // ...miljoQuestions
 ]
 
@@ -27,9 +28,9 @@ export function generateFullTeoriprov(): Question[] {
   // const miljo = shuffleArray(miljoQuestions).slice(0, 10);
   
   const combined = [
-    ...vagmarken
-    // ...trafikregler,
-    // ...miljo
+    ...vagmarken,
+    ...parkeringTillstandQuestions
+    // ...miljoQuestions
   ]
 
   return shuffleArray(combined)

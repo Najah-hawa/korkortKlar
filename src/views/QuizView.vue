@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import emailjs from '@emailjs/browser'
-import type { Question } from '@/types/question'
+import type { Question, QuestionOption } from '@/types/question'
 import { 
   getQuestionsByCategory, 
   generateQuickTest, 
@@ -20,6 +20,31 @@ const isAnswered = ref(false)
 const isSaved = ref(false)
 const isSendingReport = ref(false)
 
+// Reaktiv variabel för de blandade alternativen i den aktuella frågan
+const currentShuffledOptions = ref<QuestionOption[]>([])
+
+// --- HJÄLPFUNKTION FÖR ATT BLANDA ARRAY ---
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled: NonNullable<T>[] = [...array] as NonNullable<T>[]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    // Use non-null assertion since array is NonNullable<T>[]
+    ;[shuffled[i], shuffled[j]] = [shuffled[j]!, shuffled[i]!]
+  }
+  return shuffled
+}
+
+// --- FUNKTION FÖR ATT LADDA OCH BLANDA FRÅGANS ALTERNATIV ---
+const loadQuestionState = () => {
+  const q = questions.value[currentIndex.value]
+  if (q && q.options) {
+    // Vi blandar ordningen på alternativen
+    currentShuffledOptions.value = shuffleArray(q.options)
+  } else {
+    currentShuffledOptions.value = []
+  }
+}
+
 // --- INITIALISERING ---
 onMounted(() => {
   const categoryParam = route.query.category as string
@@ -34,32 +59,30 @@ onMounted(() => {
   } else {
     questions.value = generateQuickTest()
   }
+
+  // Ladda och blanda alternativen för första frågan
+  loadQuestionState()
 })
 
 // --- COMPUTED PROPERTIES ---
 const currentQuestion = computed(() => questions.value[currentIndex.value] || null)
-
-const progressPercent = computed(() => {
-  if (questions.value.length === 0) return 0
-  return ((currentIndex.value + 1) / questions.value.length) * 100
+const correctAnswerId = computed(() => {
+  const question = currentQuestion.value as (Question & { correctAnswerId?: QuestionOption['id'] }) | null
+  return question?.correctAnswerId ?? null
 })
-
-const isCorrect = computed(() => {
-  if (!currentQuestion.value || !selectedOptionId.value) return false
-  return selectedOptionId.value === currentQuestion.value.correctAnswerId
-})
+const isCorrect = computed(() => selectedOptionId.value !== null && selectedOptionId.value === correctAnswerId.value)
+const progressPercent = computed(() =>
+  questions.value.length
+    ? ((currentIndex.value + 1) / questions.value.length) * 100
+    : 0
+)
 
 // --- METODER ---
-const selectOption = (optionId: 'A' | 'B' | 'C' | 'D') => {
-  if (isAnswered.value) return
-  selectedOptionId.value = optionId
-  isAnswered.value = true
-}
-
 const nextQuestion = () => {
   if (currentIndex.value < questions.value.length - 1) {
     currentIndex.value++
     resetQuestionState()
+    loadQuestionState() // Blanda alternativen för nästa fråga!
   } else {
     router.push('/kategorier')
   }
@@ -69,6 +92,12 @@ const resetQuestionState = () => {
   selectedOptionId.value = null
   isAnswered.value = false
   isSaved.value = false
+}
+
+const selectOption = (optionId: QuestionOption['id']) => {
+  if (isAnswered.value) return
+  selectedOptionId.value = optionId
+  isAnswered.value = true
 }
 
 const toggleSaveQuestion = () => {
@@ -153,41 +182,42 @@ const reportError = async () => {
             </h2>
 
             <!-- SVARSALTERNATIV (A, B, C, D) -->
-            <div class="space-y-3">
-              <button
-                v-for="option in currentQuestion.options"
-                :key="option.id"
-                @click="selectOption(option.id)"
-                :disabled="isAnswered"
-                class="w-full p-4 rounded-xl border text-left flex items-center justify-between gap-4 transition-all duration-150 text-sm font-semibold cursor-pointer"
-                :class="[
-                  !isAnswered && 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 text-slate-800',
-                  isAnswered && option.id === currentQuestion.correctAnswerId && 'border-emerald-500 bg-emerald-50/60 text-emerald-950 font-bold',
-                  isAnswered && selectedOptionId === option.id && option.id !== currentQuestion.correctAnswerId && 'border-red-400 bg-red-50/60 text-red-950',
-                  isAnswered && selectedOptionId !== option.id && option.id !== currentQuestion.correctAnswerId && 'border-slate-100 opacity-50 text-slate-500'
-                ]"
-              >
-                <div class="flex items-center gap-3">
-                  <span 
-                    class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-extrabold shrink-0"
-                    :class="[
-                      isAnswered && option.id === currentQuestion.correctAnswerId 
-                        ? 'bg-emerald-500 text-white' 
-                        : isAnswered && selectedOptionId === option.id 
-                          ? 'bg-red-500 text-white' 
-                          : 'bg-slate-100 text-slate-700'
-                    ]"
-                  >
-                    {{ option.id }}
-                  </span>
-                  <span>{{ option.text.sv }}</span>
-                </div>
+           <div class="space-y-3">
+  <button
+    v-for="(option, index) in currentShuffledOptions"
+    :key="option.id"
+    @click="selectOption(option.id)"
+    :disabled="isAnswered"
+    class="w-full p-4 rounded-xl border text-left flex items-center justify-between gap-4 transition-all duration-150 text-sm font-semibold cursor-pointer"
+    :class="[
+      !isAnswered && 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 text-slate-800',
+      isAnswered && option.id === currentQuestion.correctAnswerId && 'border-emerald-500 bg-emerald-50/60 text-emerald-950 font-bold',
+      isAnswered && selectedOptionId === option.id && option.id !== currentQuestion.correctAnswerId && 'border-red-400 bg-red-50/60 text-red-950',
+      isAnswered && selectedOptionId !== option.id && option.id !== currentQuestion.correctAnswerId && 'border-slate-100 opacity-50 text-slate-500'
+    ]"
+  >
+    <div class="flex items-center gap-3">
+      <!-- عرض الحرف دائماً بترتيب متسلسل A, B, C, D بحسب موقع السطر -->
+      <span 
+        class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-extrabold shrink-0"
+        :class="[
+          isAnswered && option.id === currentQuestion.correctAnswerId 
+            ? 'bg-emerald-500 text-white' 
+            : isAnswered && selectedOptionId === option.id 
+              ? 'bg-red-500 text-white' 
+              : 'bg-slate-100 text-slate-700'
+        ]"
+      >
+        {{ ['A', 'B', 'C', 'D'][index] }}
+      </span>
+      <span>{{ option.text.sv }}</span>
+    </div>
 
-                <!-- Ikoner för rätt/fel -->
-                <span v-if="isAnswered && option.id === currentQuestion.correctAnswerId" class="text-emerald-600 font-bold">✓</span>
-                <span v-else-if="isAnswered && selectedOptionId === option.id" class="text-red-500 font-bold">✕</span>
-              </button>
-            </div>
+    <!-- علامات الصح والخطأ بناءً على ID الخيار الأصلي -->
+    <span v-if="isAnswered && option.id === currentQuestion.correctAnswerId" class="text-emerald-600 font-bold">✓</span>
+    <span v-else-if="isAnswered && selectedOptionId === option.id" class="text-red-500 font-bold">✕</span>
+  </button>
+</div>
 
           </div>
         </div>

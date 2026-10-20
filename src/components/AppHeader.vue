@@ -29,7 +29,7 @@ const isMobileMenuOpen = ref(false)
           <RouterLink to="/vagmarken" class="hover:text-amber-400 transition-colors">Vägmärken</RouterLink>
           <RouterLink to="/teoriprov" class="hover:text-amber-400 transition-colors">Teoriprov</RouterLink>
           <RouterLink to="/resultat" class="hover:text-amber-400 transition-colors">Mina fel</RouterLink>
-          <a href="#" class="hover:text-amber-400 transition-colors">Om oss</a>
+          <RouterLink to="/om-oss" class="hover:text-amber-400 transition-colors">Om oss</RouterLink>
         </nav>
 
         <!-- Language Switcher & Mobile Menu Button -->

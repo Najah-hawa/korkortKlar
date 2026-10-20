@@ -1,13 +1,18 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { roadSignsData, type RoadSign } from '@/data/roadSigns'
+import { roadSignsData, categoryDescriptions, type RoadSign } from '@/data/roadSigns'
 
 const route = useRoute()
 const router = useRouter()
 
 // Hämta kategori-koden från URL (t.ex. 'A', 'B', etc.)
 const categoryCode = computed(() => route.params.categoryCode as string)
+
+// 📌 جلب الوصف مباشرة من القاموس بناءً على رمز الفئة (مرة واحدة فقط لكل صفحة!)
+const currentCategoryDescription = computed(() => {
+  return categoryDescriptions[categoryCode.value] || 'Information och regler för denna vägmärkeskategori.'
+})
 
 // Hitta namnet på kategorin baserat på koden
 const currentCategoryName = computed(() => {
@@ -77,7 +82,7 @@ const nextSign = () => {
           Här visas alla vägmärken som ingår i denna kategori. Klicka på ett märke för att se detaljer.
         </p>
         <p class="text-slate-600 text-base">
-          Varningsmärken kännetecknas av sin triangulära form med röd rand och vit (eller gul/oransje i vissa tillfälliga fall) botten, och deras syfte är att uppmärksamma trafikanter på farliga situationer eller hinder längre fram på vägen så att de kan anpassa sin körning i god tid.
+          {{ currentCategoryDescription }}
         </p>
       </div>
 

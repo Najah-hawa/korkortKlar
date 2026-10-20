@@ -39,6 +39,11 @@ const router = createRouter({
       name: 'road-signs',
       component: () => import('../views/RoadSignsView.vue')
     },
+    {
+     path: '/om-oss',
+     name: 'about',
+     component: () => import('@/views/AboutView.vue')
+   }
   ],
 })
 

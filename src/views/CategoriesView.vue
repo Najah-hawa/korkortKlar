@@ -13,9 +13,9 @@ interface Category {
 const categories = ref<Category[]>([
   { id: 'vagmarken', title: 'Vägmärken', questionsCount: 120, icon: '⚠️', iconBg: 'bg-red-50 text-red-600' },
   { id: 'trafikregler', title: 'Trafikregler', questionsCount: 180, icon: '🚗', iconBg: 'bg-blue-50 text-blue-600' },
-  { id: 'miljo-sakerhet', title: 'Miljö & Säkerhet', questionsCount: 90, icon: '🍃', iconBg: 'bg-emerald-50 text-emerald-600' },
-  { id: 'bilens-delar', title: 'Bilens delar', questionsCount: 80, icon: '🔧', iconBg: 'bg-slate-100 text-slate-700' },
-  { id: 'personliga-risker', title: 'Personliga risker', questionsCount: 60, icon: '👤', iconBg: 'bg-indigo-50 text-indigo-600' },
+  { id: 'Miljö', title: 'Miljö & Säkerhet', questionsCount: 90, icon: '🍃', iconBg: 'bg-emerald-50 text-emerald-600' },
+  { id: 'Fordonskännedom och manövrering', title: 'Bilens delar', questionsCount: 80, icon: '🔧', iconBg: 'bg-slate-100 text-slate-700' },
+  { id: 'Personliga förutsättningar', title: 'Personliga risker', questionsCount: 60, icon: '👤', iconBg: 'bg-indigo-50 text-indigo-600' },
   { id: 'ovrigt', title: 'Övrigt', questionsCount: 50, icon: '💬', iconBg: 'bg-sky-50 text-sky-600' }
 ])
 
