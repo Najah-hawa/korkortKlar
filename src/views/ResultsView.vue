@@ -72,6 +72,15 @@ const startPracticeWrong = () => {
   router.push({ path: '/quiz', query: { type: 'wrong' } })
 }
 
+const startPracticeSaved = () => {
+  router.push({ path: '/quiz', query: { type: 'saved' } })
+}
+
+const removeSavedQuestion = (questionId: string) => {
+  savedQuestionIds.value = savedQuestionIds.value.filter(id => id !== questionId)
+  localStorage.setItem('korkortklar_saved_questions', JSON.stringify(savedQuestionIds.value))
+}
+
 const startFullTest = () => {
   router.push({ path: '/quiz', query: { type: 'full' } })
 }
@@ -242,6 +251,17 @@ const goToCategories = () => {
       <div v-if="activeTab === 'sparade'" class="space-y-6">
         <!-- OM DET FINNS SPARADE -->
         <div v-if="savedQuestions.length > 0" class="space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+            <span class="text-xs font-extrabold text-slate-600">
+              Dina sparade frågor med svar och förklaring.
+            </span>
+            <button
+              @click="startPracticeSaved"
+              class="bg-amber-400 hover:bg-amber-500 text-[#0b2545] font-extrabold text-xs px-4 py-2 rounded-xl transition-all shadow-xs cursor-pointer"
+            >
+              🔄 Öva på sparade frågor
+            </button>
+          </div>
           <div 
             v-for="q in savedQuestions" 
             :key="q.id"
@@ -253,6 +273,24 @@ const goToCategories = () => {
             <p class="font-bold text-[#0b2545] text-sm">
               {{ q.questionText.sv }}
             </p>
+            <div class="space-y-1">
+              <p
+                v-for="(option, index) in q.options"
+                :key="option.id"
+                class="text-sm"
+                :class="option.id === q.correctAnswerId ? 'font-bold text-emerald-700' : 'text-slate-600'"
+              >
+                {{ ['A', 'B', 'C', 'D'][index] }}. {{ option.text.sv }}
+                <span v-if="option.id === q.correctAnswerId">✓ Rätt svar</span>
+              </p>
+            </div>
+            <p class="text-sm text-slate-600">{{ q.explanation.sv }}</p>
+            <button
+              @click="removeSavedQuestion(q.id)"
+              class="text-xs font-bold text-red-600 hover:text-red-800 cursor-pointer"
+            >
+              Ta bort från sparade
+            </button>
           </div>
         </div>
 

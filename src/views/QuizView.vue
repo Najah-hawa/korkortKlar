@@ -82,6 +82,9 @@ onMounted(() => {
   } else if (typeParam === 'wrong') {
     const wrongQuestionIds = JSON.parse(localStorage.getItem('korkortklar_wrong_questions') || '[]') as string[]
     questions.value = allQuestions.filter(question => wrongQuestionIds.includes(question.id))
+  } else if (typeParam === 'saved') {
+    const savedQuestionIds = JSON.parse(localStorage.getItem('korkortklar_saved_questions') || '[]') as string[]
+    questions.value = allQuestions.filter(question => savedQuestionIds.includes(question.id))
   } else if (typeParam === 'quick') {
     questions.value = generateQuickTest()
   } else if (categoryParam) {
