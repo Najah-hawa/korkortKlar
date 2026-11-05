@@ -30,7 +30,7 @@ export const trafikreglerQuestions: Question[] = [
     questionText: {
       sv: 'Vad varnar detta märke för?',
       en: 'What does this sign warn for?',
-      ar: 'مذا تحذر هذه الشاخصة؟'
+      ar: 'ماذا تحذر هذه الشاخصة؟'
     },
     image: 'https://www.transportstyrelsen.se/globalassets/global/vag/vagmarken2/a.-varningsmarken/a02.-varning-for-flera-farliga-kurvor/a2-1.png',
     options: [
@@ -494,7 +494,7 @@ export const trafikreglerQuestions: Question[] = [
     },
     image: 'https://www.transportstyrelsen.se/globalassets/global/vag/vagmarken2/a.-varningsmarken/a25.-varning-for-motande-trafik/a25-1.png',
     options: [
-      { id: 'A', text: { sv: 'Mötesande trafik (enkelriktad väg övergår i tvåvägstrafik).', en: '', ar: '' } },
+      { id: 'A', text: { sv: 'Mötande trafik (enkelriktad väg övergår i tvåvägstrafik).', en: '', ar: '' } },
       { id: 'B', text: { sv: 'Körbanan smalnar av från båda håll.', en: '', ar: '' } },
       { id: 'C', text: { sv: 'Obligatorisk körbana för mötande.', en: '', ar: '' } },
       { id: 'D', text: { sv: 'Korsning med företräde för mötande.', en: '', ar: '' } }
@@ -846,7 +846,7 @@ export const trafikreglerQuestions: Question[] = [
     ],
     correctAnswerId: 'A',
     explanation: {
-      sv: 'Märket varnar för en specifik fara som inte har ett egetstandardsymbolmärke. Farans art förklaras alltid på en tilläggstavla under märket.',
+      sv: 'Märket varnar för en specifik fara som inte har ett eget standardsymbolmärke. Farans art förklaras alltid på en tilläggstavla under märket.',
       en: '',
       ar: ''
     },

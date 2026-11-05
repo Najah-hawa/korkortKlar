@@ -2778,6 +2778,7 @@ export const fordonskannedomQuestions: Question[] = [
       en: '',
       ar: ''
     },
+     image:'/images/questions/manovrering/fordon_efterfordon_22.jfif',
     // BILD REKOMMENDERAS: Ett efterfordon (till exempel en kompressor) sett från sidan och bakifrån med
     // markerade reflexer: två röda bak, orangegula sidomarkeringsreflexer på sidan, och två vita reflexer fram.
     options: [
@@ -2911,6 +2912,7 @@ export const fordonskannedomQuestions: Question[] = [
       en: '',
       ar: ''
     },
+    image:'/images/questions/manovrering/fordon_efterfordon_28.jfif',
     // BILD REKOMMENDERAS: Den officiella LGF-skylten (triangel med en spets uppåt) monterad baktill på ett efterfordon.
     // Använd gärna en bild från Transportstyrelsens sida om fordonsskyltar.
     options: [
@@ -2934,6 +2936,7 @@ export const fordonskannedomQuestions: Question[] = [
       en: '',
       ar: ''
     },
+    image:'/images/questions/manovrering/fordon_efterfordon_29.jfif',
     // BILD REKOMMENDERAS: Sidovy av ett efterfordon med LGF-skylt baktill. Två måttpilar från marken upp till
     // skyltens nedre kant: den lägsta placeringen (0,6 m) och den högsta placeringen (1,8 m).
     options: [
@@ -3245,6 +3248,7 @@ export const fordonskannedomQuestions: Question[] = [
       en: '',
       ar: ''
     },
+    image:'/images/questions/manovrering/fordon_odelbar_12.jfif',
     // BILD REKOMMENDERAS: En breddmarkeringsskylt eller varningsskylt (till exempel "Bred last") monterad på framdelen
     // av ett fordon med bred odelbar last, till exempel en båt på en släpvagn.
     options: [
@@ -3357,6 +3361,7 @@ export const fordonskannedomQuestions: Question[] = [
       en: '',
       ar: ''
     },
+     image:'/images/questions/manovrering/fordon_kalkylator_3.jfif',
     // BILD REKOMMENDERAS: En enkel illustration av en bil med en släpvagn efter sig.
     // Bilen och släpvagnen är färgade (till exempel bilen grön och släpvagnen gul) som i kalkylatorns resultatbild.
     options: [
@@ -3446,6 +3451,7 @@ export const fordonskannedomQuestions: Question[] = [
       en: '',
       ar: ''
     },
+     image:'/images/questions/manovrering/fordon_kalkylator_7.jfif',
     // BILD REKOMMENDERAS: En bil i grönt som drar en släpvagn i gult, som i kalkylatorns resultatbild.
     options: [
       { id: 'A', text: { sv: 'Att kombinationen inte får köras', en: '', ar: '' } },
