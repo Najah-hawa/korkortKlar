@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-
+import { computed } from 'vue'
+import type { Question } from '@/types/question' // Justera sökvägen till din fil
+import { allQuestions } from '@/data/questions'
 // Struktur för kategorierna
 interface Category {
   id: string
@@ -10,14 +12,35 @@ interface Category {
   iconBg: string
 }
 
-const categories = ref<Category[]>([
-  { id: 'vagmarken', title: 'Vägmärken', questionsCount: 120, icon: '⚠️', iconBg: 'bg-red-50 text-red-600' },
-  { id: 'trafikregler', title: 'Trafikregler', questionsCount: 180, icon: '🚗', iconBg: 'bg-blue-50 text-blue-600' },
-  { id: 'Miljö', title: 'Miljö & Säkerhet', questionsCount: 90, icon: '🍃', iconBg: 'bg-emerald-50 text-emerald-600' },
-  { id: 'Fordonskännedom och manövrering', title: 'Bilens delar', questionsCount: 80, icon: '🔧', iconBg: 'bg-slate-100 text-slate-700' },
-  { id: 'Personliga förutsättningar', title: 'Personliga risker', questionsCount: 60, icon: '👤', iconBg: 'bg-indigo-50 text-indigo-600' },
-  { id: 'ovrigt', title: 'Övrigt', questionsCount: 50, icon: '💬', iconBg: 'bg-sky-50 text-sky-600' }
-])
+// 1. Definiera dina kategorier grundläggande (utan hårdkodad questionsCount)
+const baseCategories = [
+  { id: 'trafikregler', title: 'Trafikregler', subtitle: 'Inkl. vägmärken', icon: '🚗', iconBg: 'bg-blue-50 text-blue-600' },
+  { id: 'Trafiksäkerhet', title: 'Trafiksäkerhet', icon: '🛑', iconBg: 'bg-red-50 text-red-600' },
+  { id: 'Miljö', title: 'Miljö', icon: '🍃', iconBg: 'bg-emerald-50 text-emerald-600' },
+  { id: 'Fordonskännedom och manövrering', title: 'Fordonskännedom och manövrering', icon: '🔧', iconBg: 'bg-slate-100 text-slate-700' },
+  { id: 'Personliga förutsättningar', title: 'Personliga förutsättningar', icon: '👤', iconBg: 'bg-indigo-50 text-indigo-600' }
+]
+
+// 2. Skapa en computed property som räknar frågorna automatiskt
+const categories = computed(() => {
+  return baseCategories.map(cat => {
+    // Filtrera fram hur många frågor som matchar denna kategori
+    const count = allQuestions.filter(q => {
+      // Om det är vägmärken har vi ju många olika underkoder (A, B, C, T osv.)
+      if (cat.id === 'vagmarken') {
+        return ['A', 'B', 'C', 'D', 'E', 'F_VAGVISNING', 'G_INRATTLINGAR', 'H_SERVICE', 'I_TURISM', 'J_UPPLYSNINGSMARKEN', 'M_VAGMARKERINGAR', 'P_POLIS', 'S_SYMBOLER', 'T_TILLAGGSTAVLOR', 'V', 'TRAFIKSIGNALER'].includes(q.categoryId) || q.categoryId === 'vagmarken'
+      }
+      
+      // För övriga kategorier (t.ex. 'Fordonskännedom och manövrering') matchar vi direkt
+      return q.categoryId === cat.id
+    }).length
+
+    return {
+      ...cat,
+      questionsCount: count
+    }
+  })
+})
 
 // Struktur för populära sidor
 const popularPages = ref([

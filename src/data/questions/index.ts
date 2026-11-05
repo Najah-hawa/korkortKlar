@@ -1,13 +1,17 @@
 import type { Question } from '@/types/question'
-import { vagmarkenQuestions } from './vagmarken'
-import {parkeringTillstandQuestions} from './trafikregler_parkering'
-// نقوم باستيراد بقية الملفات هنا عند إنشائها (trafikregler, miljo, etc.)
+import { trafikreglerQuestions } from './trafikregler'
+import { trafiksakerhetQuestions } from './trafiksakerhet'
+import { miljoQuestions } from './miljo'
+import { fordonskannedomQuestions } from './fordonskannedom'
+import { personligaQuestions } from './personliga-forutsattningar'
 
 // 1. تجميع بنك الأسئلة الشامل
 export const allQuestions: Question[] = [
-  ...vagmarkenQuestions,
-  ...parkeringTillstandQuestions
-  // ...miljoQuestions
+  ...trafikreglerQuestions,
+  ...trafiksakerhetQuestions,
+  ...miljoQuestions,
+  ...fordonskannedomQuestions,
+  ...personligaQuestions
 ]
 
 // 2. دالة خلط العناصر عشوائياً (Fisher-Yates Shuffle)
